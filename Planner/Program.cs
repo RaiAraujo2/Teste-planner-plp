@@ -3,13 +3,19 @@ using Planner.IRepository;
 using Planner.Models;
 using Planner.Repository;
 using Planner.Service;
+using System.Text.Json.Serialization;
 
 // usado para configurar os serviços e o pipeline de middleware da aplicação.
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 // Adiciona suporte para controladores e views no padrão MVC à aplicação
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddJsonOptions(options =>
+    {
+        // Adiciona suporte para enums como strings
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 // Add the configuration
 var configuration = builder.Configuration;
@@ -25,6 +31,14 @@ builder.Services.AddDbContext<Contexto>(options =>
 // Adicionar UsuarioService ao contêiner
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<UsuarioService>();
+
+// Adicionar TarefaService ao contêiner
+builder.Services.AddScoped<ITarefaRepository, TarefaRepository>();
+builder.Services.AddScoped<TarefaService>();
+
+// Adicionar MetaService ao contêiner
+builder.Services.AddScoped<IMetaRepository, MetaRepository>();
+builder.Services.AddScoped<MetaService>();
 
 // Constrói a aplicação com base nas configurações feitas no builder
 var app = builder.Build();

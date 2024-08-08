@@ -12,6 +12,11 @@ namespace Planner.Models
         public Categoria CategoriaAtividade { get; set; }
         public Status StatusAtividade { get; set; }
 
+        // Construtor padrão
+        public Atividade()
+        {
+        }
+
         // Construtor que não exige Descrição
         public Atividade(int id, string titulo, Categoria categoria, Status statusAtividade)
         {

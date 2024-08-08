@@ -6,6 +6,11 @@ namespace Planner.Models
     {
         public TimeSpan Duracao { get; set; }
 
+        // Construtor padrão
+        public Tarefa()
+        {
+        }
+
         // Construtor da classe Tarefa
         public Tarefa(int id, string titulo, string descricao, Categoria categoria, Status statusAtividade, TimeSpan duracao)
             : base(id, titulo, descricao, categoria, statusAtividade) // Chamada ao construtor da classe base

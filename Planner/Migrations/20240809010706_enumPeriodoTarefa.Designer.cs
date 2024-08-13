@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Planner.Models;
 
@@ -10,9 +11,11 @@ using Planner.Models;
 namespace Planner.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20240809010706_enumPeriodoTarefa")]
+    partial class enumPeriodoTarefa
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -34,6 +37,9 @@ namespace Planner.Migrations
                         .HasMaxLength(13)
                         .HasColumnType("TEXT");
 
+                    b.Property<int>("StatusAtividade")
+                        .HasColumnType("INTEGER");
+
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasColumnType("TEXT");
@@ -53,25 +59,16 @@ namespace Planner.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<DateTime>("DataHora")
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("Descricao")
+                        .IsRequired()
                         .HasColumnType("TEXT");
-
-                    b.Property<bool>("RecorrenteSemanal")
-                        .HasColumnType("INTEGER");
 
                     b.Property<int>("TipoLembrete")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.HasKey("Id");
 
-                    b.ToTable("Lembretes");
+                    b.ToTable("lembretes");
                 });
 
             modelBuilder.Entity("Planner.Models.Relatorio", b =>
@@ -115,9 +112,6 @@ namespace Planner.Migrations
                     b.Property<DateTime>("Prazo")
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("StatusMeta")
-                        .HasColumnType("INTEGER");
-
                     b.HasDiscriminator().HasValue("Meta");
                 });
 
@@ -130,9 +124,6 @@ namespace Planner.Migrations
 
                     b.Property<DateTime>("Dia")
                         .HasColumnType("TEXT");
-
-                    b.Property<int>("StatusTarefa")
-                        .HasColumnType("INTEGER");
 
                     b.HasDiscriminator().HasValue("Tarefa");
                 });

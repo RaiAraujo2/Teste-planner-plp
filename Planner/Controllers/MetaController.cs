@@ -28,7 +28,7 @@ namespace Planner.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetMetas([FromQuery] Categoria? categoria = null, [FromQuery] Status? status = null)
+        public async Task<IActionResult> GetMetas([FromQuery] Categoria? categoria = null, [FromQuery] StatusMeta? status = null)
         {
             if (categoria.HasValue)
             {

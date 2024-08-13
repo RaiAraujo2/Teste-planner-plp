@@ -8,7 +8,7 @@ namespace Planner.IRepository
         Task<Meta> GetByIdAsync(int id);
         Task<IEnumerable<Meta>> GetAllAsync();
         Task<IEnumerable<Meta>> GetByCategoriaAsync(Categoria categoria);
-        Task<IEnumerable<Meta>> GetByStatusAsync(Status status);
+        Task<IEnumerable<Meta>> GetByStatusAsync(StatusMeta status);
         Task AddAsync(Meta meta);
         Task UpdateAsync(Meta meta);
         Task DeleteAsync(int id);

@@ -9,12 +9,16 @@ namespace Planner.IRepository
         Task<IEnumerable<Tarefa>> GetAllAsync();
         Task<IEnumerable<Tarefa>> GetByCategoriaAsync(Categoria categoria);
 
-        Task<IEnumerable<Tarefa>> GetByStatusAsync(Status status);
+        Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status);
+
+        Task<IEnumerable<Tarefa>> GetTarefasByCategoriaAndStatusAsync(StatusTarefa status, Categoria categoria);
 
         //Task<IEnumerable<Tarefa>> GetByDataAsync(DateTime data);
 
         Task AddAsync(Tarefa tarefa);
         Task UpdateAsync(Tarefa tarefa);
         Task DeleteAsync(int id);
+
+        Task DeleteAllAsync();
     }
 }

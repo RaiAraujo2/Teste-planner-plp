@@ -4,7 +4,10 @@ namespace Planner.Models
 {
     public class Tarefa: Atividade
     {
-        public TimeSpan Duracao { get; set; }
+        public BlocoDuracao BlocoDuracao { get; set; }
+        public DateTime Dia { get; set; } = DateTime.Now.Date;
+
+        public StatusTarefa StatusTarefa { get; set; }
 
         // Construtor padrão
         public Tarefa()
@@ -12,17 +15,22 @@ namespace Planner.Models
         }
 
         // Construtor da classe Tarefa
-        public Tarefa(int id, string titulo, string descricao, Categoria categoria, Status statusAtividade, TimeSpan duracao)
-            : base(id, titulo, descricao, categoria, statusAtividade) // Chamada ao construtor da classe base
+        public Tarefa(int id, string titulo, string descricao, Categoria categoria, StatusTarefa statusTarefa, BlocoDuracao blocoDuracao, DateTime dia)
+            : base(id, titulo, descricao, categoria) // Chamada ao construtor da classe base
         {
-            Duracao = duracao;
+
+            StatusTarefa = statusTarefa;
+            BlocoDuracao = blocoDuracao;
+            Dia = dia;
         }
 
         // Opcional: Construtor com parâmetro Descrição opcional
-        public Tarefa(int id, string titulo, Categoria categoria, Status statusAtividade, TimeSpan duracao, string? descricao = null)
-            : base(id, titulo, descricao, categoria, statusAtividade) // Chamada ao construtor da classe base
+        public Tarefa(int id, string titulo, Categoria categoria, StatusTarefa? statusTarefa, BlocoDuracao blocoDuracao, DateTime dia , string? descricao = null)
+            : base(id, titulo, descricao, categoria) // Chamada ao construtor da classe base
         {
-            Duracao = duracao;
+            BlocoDuracao = blocoDuracao;
+            Dia = dia;
+            statusTarefa = StatusTarefa.NaoIniciada;
         }
     }
 }

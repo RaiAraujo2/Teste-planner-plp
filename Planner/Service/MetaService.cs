@@ -28,7 +28,7 @@ namespace Planner.Service
             return await _metaRepository.GetByCategoriaAsync(categoria);
         }
 
-        public async Task<IEnumerable<Meta>> GetMetasByStatusAsync(Status status)
+        public async Task<IEnumerable<Meta>> GetMetasByStatusAsync(StatusMeta status)
         {
             return await _metaRepository.GetByStatusAsync(status);
         }

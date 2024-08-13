@@ -40,6 +40,10 @@ builder.Services.AddScoped<TarefaService>();
 builder.Services.AddScoped<IMetaRepository, MetaRepository>();
 builder.Services.AddScoped<MetaService>();
 
+// Adicionar LembreteService ao contêiner
+builder.Services.AddScoped<ILembreteRepository, LembreteRepository>();
+builder.Services.AddScoped<LembreteService>();
+
 // Constrói a aplicação com base nas configurações feitas no builder
 var app = builder.Build();
 

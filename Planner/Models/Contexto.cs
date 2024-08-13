@@ -9,7 +9,7 @@ namespace Planner.Models
         public DbSet<Atividade> Atividades { get; set; }
         public DbSet<Tarefa> Tarefas { get; set; }
         public DbSet<Meta> Metas { get; set; }
-        public DbSet<Lembrete> lembretes { get; set; }
+        public DbSet<Lembrete> Lembretes { get; set; }
 
 
         public Contexto(DbContextOptions<Contexto> options) : base(options)

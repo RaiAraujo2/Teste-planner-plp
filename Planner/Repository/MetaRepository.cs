@@ -17,6 +17,7 @@ namespace Planner.Repository
 
         public async Task<Meta> GetByIdAsync(int id)
         {
+            
             return await _context.Metas.FindAsync(id);
         }
 
@@ -32,10 +33,10 @@ namespace Planner.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Meta>> GetByStatusAsync(Status status)
+        public async Task<IEnumerable<Meta>> GetByStatusAsync(StatusMeta status)
         {
             return await _context.Metas
-                .Where(m => m.StatusAtividade == status)
+                .Where(m => m.StatusMeta == status)
                 .ToListAsync();
         }
 

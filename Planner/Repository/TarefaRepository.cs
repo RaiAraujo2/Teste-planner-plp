@@ -31,10 +31,17 @@ namespace Planner.Repository
                 .ToListAsync();
         }
 
-        public async Task<IEnumerable<Tarefa>> GetByStatusAsync(Status status)
+        public async Task<IEnumerable<Tarefa>> GetByStatusAsync(StatusTarefa status)
         {
             return await _context.Tarefas
-                .Where(t => t.StatusAtividade == status)
+                .Where(t => t.StatusTarefa == status)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Tarefa>> GetTarefasByCategoriaAndStatusAsync(StatusTarefa status, Categoria categoria)
+        {
+            return await _context.Tarefas
+                .Where(t => t.StatusTarefa == status && t.CategoriaAtividade == categoria)
                 .ToListAsync();
         }
 
@@ -67,6 +74,12 @@ namespace Planner.Repository
                 _context.Tarefas.Remove(tarefa);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task DeleteAllAsync()
+        {
+            _context.Tarefas.RemoveRange(_context.Tarefas);
+            await _context.SaveChangesAsync();
         }
     }
 }

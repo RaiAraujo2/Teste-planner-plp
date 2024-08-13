@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Planner.Models;
 
@@ -10,9 +11,11 @@ using Planner.Models;
 namespace Planner.Migrations
 {
     [DbContext(typeof(Contexto))]
-    partial class ContextoModelSnapshot : ModelSnapshot
+    [Migration("20240813125813_Lembrete")]
+    partial class Lembrete
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.7");
@@ -65,7 +68,7 @@ namespace Planner.Migrations
                     b.Property<int>("TipoLembrete")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Titulo")
+                    b.Property<string>("titulo")
                         .IsRequired()
                         .HasColumnType("TEXT");
 

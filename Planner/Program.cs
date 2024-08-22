@@ -44,6 +44,10 @@ builder.Services.AddScoped<MetaService>();
 builder.Services.AddScoped<ILembreteRepository, LembreteRepository>();
 builder.Services.AddScoped<LembreteService>();
 
+// Adicionar RelatorioService ao contêiner
+builder.Services.AddScoped<IRelatorioRepository, RelatorioRepository>();
+builder.Services.AddScoped<RelatorioService>();
+
 // Constrói a aplicação com base nas configurações feitas no builder
 var app = builder.Build();
 

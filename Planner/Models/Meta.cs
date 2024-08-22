@@ -7,6 +7,7 @@ namespace Planner.Models
         //TODO: Adicionar verificação de prazo para que seja sempre maior que a data atual
         public DateTime Prazo { get; set; }
 
+        //TODO: 
         public StatusMeta StatusMeta { get; set; }
 
         // Construtor padrão da classe Tarefa

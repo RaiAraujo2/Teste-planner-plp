@@ -2,12 +2,12 @@
 using Planner.Models.Enum;
 using Planner.Models;
 using Planner.Service;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace Planner.Controllers
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class TarefaController : ControllerBase
+    public class TarefaController : Controller
     {
         private readonly TarefaService _tarefaService;
 
@@ -16,107 +16,145 @@ namespace Planner.Controllers
             _tarefaService = tarefaService;
         }
 
-
-        // Pega uma tarefa pelo id
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetTarefa(int id)
+        // GET: /Tarefa
+        public async Task<IActionResult> Index([FromQuery] Categoria? categoria = null, [FromQuery] StatusTarefa? status = null)
         {
-            var tarefa = await _tarefaService.GetTarefaByIdAsync(id);
-            if (tarefa == null)
-            {
-                return NotFound();
-            }
-            return Ok(tarefa);
-        }
+            IEnumerable<Tarefa> tarefas;
 
-        // Pega todas as tarefas ou filtra por categoria ou status
-        // Exemplo de chamada: /api/tarefa?categoria=Estudo
-        // Exemplo de chamada: /api/tarefa?status=Concluido
-        // FromQuery é um atributo que indica que um parâmetro de ação deve ser vinculado a um valor de string de consulta da URL.
-        [HttpGet]
-        public async Task<IActionResult> GetTarefas([FromQuery] Categoria? categoria = null, [FromQuery] StatusTarefa? status = null)
-        {
             if (categoria.HasValue && status.HasValue)
             {
-                // Busca tarefas filtrando por categoria e status
-                var tarefas = await _tarefaService.GetTarefasByCategoriaAndStatusAsync(status.Value, categoria.Value);
-                return Ok(tarefas);
+                tarefas = await _tarefaService.GetTarefasByCategoriaAndStatusAsync(status.Value, categoria.Value);
             }
-
-            if (categoria.HasValue)
+            else if (categoria.HasValue)
             {
-                var tarefas = await _tarefaService.GetTarefasByCategoriaAsync(categoria.Value);
-                return Ok(tarefas);
+                tarefas = await _tarefaService.GetTarefasByCategoriaAsync(categoria.Value);
             }
-
-            if (status.HasValue)
+            else if (status.HasValue)
             {
-                var tarefas = await _tarefaService.GetTarefasByStatusAsync(status.Value);
-                return Ok(tarefas);
+                tarefas = await _tarefaService.GetTarefasByStatusAsync(status.Value);
+            }
+            else
+            {
+                tarefas = await _tarefaService.GetAllTarefasAsync();
             }
 
-            var allTarefas = await _tarefaService.GetAllTarefasAsync();
-            return Ok(allTarefas);
+            return View(tarefas); // Renderiza a view 'Index' com a lista de tarefas
         }
 
-        // Cria uma nova tarefa 
-        [HttpPost]
-        public async Task<IActionResult> CreateTarefa([FromBody] Tarefa tarefa)
+        // GET: /Tarefa/Detalhes/5
+        public async Task<IActionResult> Detalhes(int id)
         {
+            var tarefa = await _tarefaService.GetTarefaByIdAsync(id);
+
             if (tarefa == null)
             {
-                return BadRequest();
-            }
-            if (tarefa.Dia == default(DateTime))  // Verifica se Dia não foi fornecido (é o valor padrão de DateTime)
-            {
-                tarefa.Dia = DateTime.Now.Date;  // Define como a data atual
+                return NotFound();
             }
 
-            await _tarefaService.AddTarefaAsync(tarefa);
-            return CreatedAtAction(nameof(GetTarefa), new { id = tarefa.Id }, tarefa);
+            return View(tarefa); // Renderiza a view 'Detalhes' com a tarefa específica
         }
 
-
-        //TODO: Nem esse nem os outros metodos PUT estão funcionado
-        // Atualiza uma tarefa
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTarefa(int id, [FromBody] Tarefa tarefa)
+        // GET: /Tarefa/Adicionar
+        public IActionResult Adicionar()
         {
-            if (tarefa == null || tarefa.Id != id)
+            return View(); // Renderiza a view 'Adicionar'
+        }
+
+        // POST: /Tarefa/Adicionar
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Adicionar(Tarefa tarefa)
+        {
+            if (ModelState.IsValid)
             {
-                return BadRequest();
+                if (tarefa.Dia == default(DateTime))
+                {
+                    tarefa.Dia = DateTime.Now.Date;
+                }
+
+                await _tarefaService.AddTarefaAsync(tarefa);
+                return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após adicionar a tarefa
             }
 
-            var existingTarefa = await _tarefaService.GetTarefaByIdAsync(id);
-            if (existingTarefa == null)
+            return View(tarefa); // Se o modelo não for válido, retorna à view 'Adicionar' com os dados preenchidos
+        }
+
+        // GET: /Tarefa/Editar/5
+        public async Task<IActionResult> Editar(int id)
+        {
+            var tarefa = await _tarefaService.GetTarefaByIdAsync(id);
+
+            if (tarefa == null)
             {
                 return NotFound();
             }
 
-            await _tarefaService.UpdateTarefaAsync(tarefa);
-            return NoContent();
+            return View(tarefa); // Renderiza a view 'Editar' com a tarefa específica
         }
 
-        // Deleta uma tarefa
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTarefa(int id)
+        // POST: /Tarefa/Editar/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(int id, Tarefa tarefaAtualizada)
         {
-            var existingTarefa = await _tarefaService.GetTarefaByIdAsync(id);
-            if (existingTarefa == null)
+            if (id != tarefaAtualizada.Id)
+            {
+                return BadRequest();
+            }
+
+            if (ModelState.IsValid)
+            {
+                try
+                {
+                    await _tarefaService.UpdateTarefaAsync(tarefaAtualizada);
+                }
+                catch (DbUpdateConcurrencyException)
+                {
+                    var existingTarefa = await _tarefaService.GetTarefaByIdAsync(id);
+                    if (existingTarefa == null)
+                    {
+                        return NotFound();
+                    }
+                    throw;
+                }
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(tarefaAtualizada);
+        }
+
+
+
+        // GET: /Tarefa/Deletar/5
+        public async Task<IActionResult> Deletar(int id)
+        {
+            var tarefa = await _tarefaService.GetTarefaByIdAsync(id);
+
+            if (tarefa == null)
             {
                 return NotFound();
             }
 
+            return View(tarefa); // Renderiza a view 'Deletar' com a tarefa específica
+        }
+
+        // POST: /Tarefa/Deletar/5
+        [HttpPost, ActionName("Deletar")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletarConfirmado(int id)
+        {
             await _tarefaService.DeleteTarefaAsync(id);
-            return NoContent();
+            return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após deletar a tarefa
         }
 
-        // Deleta todas as tarefas
-        [HttpDelete]
-        public async Task<IActionResult> DeleteAllTarefas()
+        // POST: /Tarefa/DeletarTodos
+        [HttpPost]
+        [Route("DeletarTodos")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletarTodos()
         {
             await _tarefaService.DeleteAllTarefasAsync();
-            return NoContent();
+            return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após deletar todas as tarefas
         }
     }
 }

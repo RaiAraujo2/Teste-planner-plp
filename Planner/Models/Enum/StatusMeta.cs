@@ -2,6 +2,7 @@
 {
     public enum StatusMeta
     {
+        NãoIniciada,
         sucesso,
         semSucesso,
         parcialmenteAtingidas

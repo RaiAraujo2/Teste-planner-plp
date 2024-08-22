@@ -1,12 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Planner.Models;
 using Planner.Service;
+using System.Threading.Tasks;
 
 namespace Planner.Controllers
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class LembreteController : ControllerBase
+    public class LembreteController : Controller
     {
         private readonly LembreteService _lembreteService;
 
@@ -15,17 +14,15 @@ namespace Planner.Controllers
             _lembreteService = lembreteService;
         }
 
-        // GET: api/lembrete
-        [HttpGet]
-        public async Task<IActionResult> GetLembretes()
+        // GET: /Lembrete
+        public async Task<IActionResult> Index()
         {
             var lembretes = await _lembreteService.GetLembretesAsync();
-            return Ok(lembretes);
+            return View(lembretes); // Renderiza a view 'Index' com a lista de lembretes
         }
 
-        // GET: api/lembrete/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetLembreteById(int id)
+        // GET: /Lembrete/Detalhes/5
+        public async Task<IActionResult> Detalhe(int id)
         {
             var lembrete = await _lembreteService.GetLembreteByIdAsync(id);
 
@@ -34,76 +31,63 @@ namespace Planner.Controllers
                 return NotFound();
             }
 
-            return Ok(lembrete);
+            return View(lembrete); // Renderiza a view 'Detalhes' com o lembrete específico
         }
 
-        // GET: api/lembrete/hoje
-        [HttpGet("hoje")]
-        public async Task<IActionResult> GetLembretesParaHoje()
+        // GET: /Lembrete/Adicionar
+        public IActionResult Adicionar()
         {
-            var lembretes = await _lembreteService.GetLembretesParaHojeAsync();
-            return Ok(lembretes);
+            return View(); // Renderiza a view 'Adicionar'
         }
 
-        // GET: api/lembrete/amanha
-        [HttpGet("amanha")]
-        public async Task<IActionResult> GetLembretesParaAmanha()
-        {
-            var lembretes = await _lembreteService.GetLembretesParaAmanhaAsync();
-            return Ok(lembretes);
-        }
-
-        // GET: api/lembrete/semana
-        [HttpGet("semana")]
-        public async Task<IActionResult> GetLembretesParaEstaSemana()
-        {
-            var lembretes = await _lembreteService.GetLembretesParaEstaSemanaAsync();
-            return Ok(lembretes);
-        }
-
-        // GET: api/lembrete/mes
-        [HttpGet("mes")]
-        public async Task<IActionResult> GetLembretesParaEsteMes()
-        {
-            var lembretes = await _lembreteService.GetLembretesParaEsteMesAsync();
-            return Ok(lembretes);
-        }
-
-        // POST: api/lembrete
+        // POST: /Lembrete/Adicionar
         [HttpPost]
-        public async Task<IActionResult> AdicionarLembrete([FromBody] Lembrete lembrete)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Adicionar(Lembrete lembrete)
         {
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                await _lembreteService.AdicionarLembreteAsync(lembrete);
+                return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após adicionar o lembrete
             }
 
-            await _lembreteService.AdicionarLembreteAsync(lembrete);
-            return CreatedAtAction(nameof(GetLembreteById), new { id = lembrete.Id }, lembrete);
+            return View(lembrete); // Se o modelo não for válido, retorna à view 'Adicionar' com os dados preenchidos
         }
 
-        // PUT: api/lembrete/5
-        [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarLembrete(int id, [FromBody] Lembrete lembreteAtualizado)
+        // GET: /Lembrete/Editar/5
+        public async Task<IActionResult> Editar(int id)
         {
-            if (id != lembreteAtualizado.Id || !ModelState.IsValid)
+            var lembrete = await _lembreteService.GetLembreteByIdAsync(id);
+
+            if (lembrete == null)
+            {
+                return NotFound();
+            }
+
+            return View(lembrete); // Renderiza a view 'Editar' com o lembrete específico
+        }
+
+        // POST: /Lembrete/Editar/5
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Editar(int id, Lembrete lembreteAtualizado)
+        {
+            if (id != lembreteAtualizado.Id)
             {
                 return BadRequest();
             }
 
-            var lembreteExistente = await _lembreteService.GetLembreteByIdAsync(id);
-            if (lembreteExistente == null)
+            if (ModelState.IsValid)
             {
-                return NotFound();
+                await _lembreteService.AtualizarLembreteAsync(lembreteAtualizado);
+                return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após atualizar o lembrete
             }
 
-            await _lembreteService.AtualizarLembreteAsync(lembreteAtualizado);
-            return NoContent();
+            return View(lembreteAtualizado); // Se o modelo não for válido, retorna à view 'Editar' com os dados preenchidos
         }
 
-        // DELETE: api/lembrete/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeletarLembrete(int id)
+        // GET: /Lembrete/Deletar/5
+        public async Task<IActionResult> Deletar(int id)
         {
             var lembrete = await _lembreteService.GetLembreteByIdAsync(id);
 
@@ -112,16 +96,24 @@ namespace Planner.Controllers
                 return NotFound();
             }
 
-            await _lembreteService.DeletarLembreteAsync(id);
-            return NoContent();
+            return View(lembrete); // Renderiza a view 'Deletar' com o lembrete específico
         }
 
-        // POST: api/lembrete/processar
-        [HttpPost("processar")]
-        public async Task<IActionResult> ProcessarLembretes()
+        // POST: /Lembrete/Deletar/5
+        [HttpPost, ActionName("Deletar")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeletarConfirmado(int id)
+        {
+            await _lembreteService.DeletarLembreteAsync(id);
+            return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após deletar o lembrete
+        }
+
+
+        // GET: /Lembrete/Processar
+        public async Task<IActionResult> Processar()
         {
             await _lembreteService.ProcessarLembretes();
-            return Ok();
+            return RedirectToAction(nameof(Index)); // Redireciona para a ação Index após processar os lembretes
         }
     }
 }

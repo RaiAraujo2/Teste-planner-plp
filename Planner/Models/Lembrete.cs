@@ -27,5 +27,8 @@ namespace Planner.Models
             Descricao = descricao;
             TipoLembrete = tipoLembrete;
         }
+
+        // Construtor da classe Lembrete
+        public Lembrete() { }
     }
 }
